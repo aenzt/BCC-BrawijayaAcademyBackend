@@ -4,6 +4,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { AuthModule } from './auth/auth.module';
+import { CoursesModule } from './courses/courses.module';
 
 @Module({
   imports: [UsersModule, TypeOrmModule.forRoot({
@@ -14,7 +15,7 @@ import { AuthModule } from './auth/auth.module';
     database: 'nestjs',
     autoLoadEntities: true,
     synchronize: true,
-  }), AuthModule],
+  }), AuthModule, CoursesModule],
   providers: [UsersService],
 })
 export class AppModule implements NestModule{
