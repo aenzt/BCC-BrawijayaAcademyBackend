@@ -5,8 +5,8 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import * as puppeteer from 'puppeteer';
-import { CreateUserDto } from 'src/users/dto/createUser.dto';
-import { loginUserDto } from 'src/users/dto/loginUser.dto';
+import { CreateUserDto } from 'src/auth/dto/createUser.dto';
+import { loginUserDto } from 'src/auth/dto/loginUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async validateUser(nim : number, password : string): Promise<any> {
+  async validateUser(nim: number, password: string): Promise<any> {
     const user = await this.usersService.findOne(nim);
     if (await user.validatePassword(password)) {
       const { password, ...result } = user;
@@ -26,10 +26,23 @@ export class AuthService {
     return null;
   }
 
-  async login(loginDto : loginUserDto) {
-    const user = await this.validateUser(loginDto.nim, loginDto.password);
+  async login(loginDto: loginUserDto) {
+    let user : User;
+    if (loginDto.nim) {
+      user = await this.validateUser(loginDto.nim, loginDto.password);
+    } else if (loginDto.email) {
+      user = await this.validateUser(loginDto.nim, loginDto.password);
+    } else {
+      throw new HttpException(
+        'NIM / Email is required',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     if (!user) {
-      throw new HttpException('NIM / Password is incorrect', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Invalid Credentials',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
     const payload = { sub: user.nim, email: user.email };
     return {
@@ -37,7 +50,7 @@ export class AuthService {
     };
   }
 
-  private async checkSiam(username:string, password:string) {
+  private async checkSiam(username: string, password: string) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.goto('https://siam.ub.ac.id/', { waitUntil: 'networkidle2' });
@@ -85,12 +98,14 @@ export class AuthService {
     user.email = createUserDto.email;
     user.password = createUserDto.password;
 
-    const [fullName, faculty, major] = await this.checkSiam(createUserDto.nim.toString(), createUserDto.password);
+    const [fullName, faculty, major] = await this.checkSiam(
+      createUserDto.nim.toString(),
+      createUserDto.password,
+    );
     user.fullName = fullName;
     user.faculty = faculty;
     user.major = major;
 
     return this.usersRepository.save(user);
   }
-
 }
