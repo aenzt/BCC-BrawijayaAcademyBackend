@@ -1,12 +1,21 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerMiddleware } from './middleware/logger.middleware';
-import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
+import { UsersModule } from './users/users.module';
+import { UsersService } from './users/users.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [UserModule],
-  controllers: [],
-  providers: [UserService],
+  imports: [UsersModule, TypeOrmModule.forRoot({
+    type: 'mysql',
+    host: 'localhost',
+    port: 3306,
+    username: 'root',
+    database: 'nestjs',
+    autoLoadEntities: true,
+    synchronize: true,
+  }), AuthModule],
+  providers: [UsersService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
