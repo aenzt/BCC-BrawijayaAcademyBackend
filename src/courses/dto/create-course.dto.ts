@@ -1,18 +1,26 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsUrl, ValidateIf } from "class-validator";
 
 export class CreateCourseDto {
-    @IsNotEmpty()
-    @ApiProperty()
-    courseName :string;
-
     @ApiProperty()
     @IsNotEmpty()
-    courseDescription : string;
+    name :string;
 
     @ApiProperty()
-    courseBody: string;
+    @IsNotEmpty()
+    description : string;
 
     @ApiProperty()
-    coursePlaylistLink: string;
+    @ValidateIf(o => o.courseBody)
+    @IsNotEmpty()
+    body: string;
+
+    @ApiProperty()
+    @ValidateIf(o => o.coursePlaylistLink)
+    @IsNotEmpty()
+    @IsUrl()
+    playlistLink: string;
+
+    @ApiProperty()
+    categoryId : number;
 }

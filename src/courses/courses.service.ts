@@ -4,6 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CategoriesService } from 'src/categories/categories.service';
 import { Repository } from 'typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -14,20 +15,22 @@ export class CoursesService {
   constructor(
     @InjectRepository(Course)
     private readonly courseRepository: Repository<Course>,
+    private categoryService: CategoriesService,
   ) {}
 
-  create(createCourseDto: CreateCourseDto) {
+  async create(createCourseDto: CreateCourseDto) {
     const course = new Course();
-    course.name = createCourseDto.courseName;
-    course.description = createCourseDto.courseDescription;
-    course.body = createCourseDto.courseBody;
-    course.playlistLink = createCourseDto.coursePlaylistLink;
-
+    course.name = createCourseDto.name;
+    course.description = createCourseDto.description;
+    course.body = createCourseDto.body;
+    course.playlistLink = createCourseDto.playlistLink;
+    const category = await this.categoryService.findOne(createCourseDto.categoryId);
+    course.categories = [category];
     return this.courseRepository.save(course);
   }
 
   async findAll() {
-    const course = await this.courseRepository.find();
+    const course = await this.courseRepository.find({relations: ["categories"]});
     if (course.length < 1) {
       throw new HttpException('No course found', HttpStatus.NOT_FOUND);
     }
@@ -35,7 +38,7 @@ export class CoursesService {
   }
 
   async findOne(id: number) {
-    const course = await this.courseRepository.findOne(id);
+    const course = await this.courseRepository.findOne(id, {relations: ["categories"]});
     if (!course) {
       throw new HttpException(
         `Course with id ${id} not found`,
@@ -53,17 +56,17 @@ export class CoursesService {
           HttpStatus.NOT_FOUND,
         );
       }
-    if (updateCourseDto.courseName){
-        course.name = updateCourseDto.courseName
+    if (updateCourseDto.name){
+        course.name = updateCourseDto.name
     }
-    if(updateCourseDto.courseDescription){
-        course.description = updateCourseDto.courseDescription
+    if(updateCourseDto.description){
+        course.description = updateCourseDto.description
     }
-    if(updateCourseDto.courseBody){
-        course.body = updateCourseDto.courseBody
+    if(updateCourseDto.body){
+        course.body = updateCourseDto.body
     }
-    if(updateCourseDto.coursePlaylistLink){
-        course.playlistLink = updateCourseDto.coursePlaylistLink
+    if(updateCourseDto.playlistLink){
+        course.playlistLink = updateCourseDto.playlistLink
     }
 
     return this.courseRepository.save(course);

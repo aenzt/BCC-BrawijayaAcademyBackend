@@ -5,7 +5,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 
 @Controller('courses')
-@ApiTags('courses(WIP)')
+@ApiTags('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 

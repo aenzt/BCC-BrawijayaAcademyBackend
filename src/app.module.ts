@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { CoursesModule } from './courses/courses.module';
 import { User } from './users/entities/user.entity';
 import { Course } from './courses/entities/course.entity';
+import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/entities/category.entity';
 
 @Module({
   imports: [UsersModule, TypeOrmModule.forRoot({
@@ -14,9 +16,9 @@ import { Course } from './courses/entities/course.entity';
     port: 3306,
     username: 'root',
     database: 'nestjs',
-    entities: [User, Course],
+    autoLoadEntities: true,
     synchronize: true,
-  }), AuthModule, CoursesModule],
+  }), AuthModule, CoursesModule, CategoriesModule],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {

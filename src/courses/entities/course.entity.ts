@@ -1,3 +1,4 @@
+import { Category } from "src/categories/entities/category.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -20,5 +21,8 @@ export class Course {
 
     @ManyToMany(() => User, user => user.coursesOwned)
     user: User[];
+
+    @ManyToMany(() => Category, category => category.courses)
+    categories: Category[];
 
 }
