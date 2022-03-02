@@ -1,12 +1,15 @@
 import { Exclude } from "class-transformer";
-import { BeforeInsert, Column, Entity, Long, PrimaryColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { ApiProperty } from "@nestjs/swagger";
+import { Course } from "src/courses/entities/course.entity";
 
 @Entity()
 export class User {
     @PrimaryColumn({
         type: 'bigint',
     })
+    @ApiProperty()
     nim : number;
 
     @Column()
@@ -14,19 +17,28 @@ export class User {
     password : string;
 
     @Column()
+    @ApiProperty()
     email : string;
 
     @Column({})
+    @ApiProperty()
     fullName : string;
 
     @Column({})
+    @ApiProperty()
     faculty : string;
 
     @Column({})
+    @ApiProperty()
     major : string;
 
     //tba
     //course owned
+    // @ApiProperty()
+    @ManyToMany(() => Course, course => course.user)
+    @JoinTable()
+    coursesOwned : Course[];
+
     @BeforeInsert()
     async hashPassword(){
         const salt = await bcrypt.genSaltSync()

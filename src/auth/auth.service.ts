@@ -1,4 +1,3 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
@@ -7,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import * as puppeteer from 'puppeteer';
 import { CreateUserDto } from 'src/auth/dto/createUser.dto';
 import { loginUserDto } from 'src/auth/dto/loginUser.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +19,9 @@ export class AuthService {
 
   async validateUser(nim: number, password: string): Promise<any> {
     const user = await this.usersService.findOne(nim);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
     if (await user.validatePassword(password)) {
       const { password, ...result } = user;
       return result;
@@ -27,26 +30,19 @@ export class AuthService {
   }
 
   async login(loginDto: loginUserDto) {
-    let user : User;
-    if (loginDto.nim) {
-      user = await this.validateUser(loginDto.nim, loginDto.password);
-    } else if (loginDto.email) {
-      user = await this.validateUser(loginDto.nim, loginDto.password);
-    } else {
-      throw new HttpException(
-        'NIM / Email is required',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+    const user = await this.validateUser(loginDto.nim, loginDto.password);
     if (!user) {
-      throw new HttpException(
-        'Invalid Credentials',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+        throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
+      }
     const payload = { sub: user.nim, email: user.email };
     return {
-      access_token: this.jwtService.sign(payload),
+      statusCode: HttpStatus.OK,
+      message: 'Login Success',
+      data: {
+        nim: user.nim,
+        fullName: user.fullName,
+        access_token: this.jwtService.sign(payload),
+      },
     };
   }
 
@@ -88,7 +84,7 @@ export class AuthService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = new User();
-    const find = await this.usersRepository.findOne(createUserDto);
+    const find = await this.usersRepository.findOne(createUserDto.nim);
 
     if (find) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
@@ -105,7 +101,7 @@ export class AuthService {
     user.fullName = fullName;
     user.faculty = faculty;
     user.major = major;
-
+    
     return this.usersRepository.save(user);
   }
 }
