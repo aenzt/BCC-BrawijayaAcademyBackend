@@ -19,6 +19,9 @@ export class Course {
     @Column({nullable: true})
     playlistLink : string;
 
+    @Column()
+    price : number;
+
     @ManyToMany(() => User, user => user.coursesOwned)
     user: User[];
 

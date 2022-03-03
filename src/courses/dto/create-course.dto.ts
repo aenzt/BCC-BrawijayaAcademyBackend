@@ -22,5 +22,9 @@ export class CreateCourseDto {
     playlistLink: string;
 
     @ApiProperty()
+    @IsNotEmpty()
+    price: number;
+
+    @ApiProperty()
     categoryId : number;
 }

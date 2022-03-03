@@ -33,4 +33,9 @@ export class CoursesController {
   remove(@Param('id') id: string) {
     return this.coursesService.remove(+id);
   }
+
+  @Get(':id/buy')
+  buy(@Param('id') id: string){
+      return this.coursesService.buy(+id);
+  }
 }

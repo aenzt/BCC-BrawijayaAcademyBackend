@@ -4,21 +4,20 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CoursesModule } from './courses/courses.module';
-import { User } from './users/entities/user.entity';
-import { Course } from './courses/entities/course.entity';
 import { CategoriesModule } from './categories/categories.module';
-import { Category } from './categories/entities/category.entity';
+import { ConfigModule } from '@nestjs/config';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forRoot({
+  imports: [ConfigModule.forRoot(), UsersModule, TypeOrmModule.forRoot({
     type: 'mysql',
     host: 'localhost',
     port: 3306,
-    username: 'root',
-    database: 'nestjs',
+    username: process.env.DATABASE_USERNAME,
+    database: process.env.DATABASE_NAME,
     autoLoadEntities: true,
     synchronize: true,
-  }), AuthModule, CoursesModule, CategoriesModule],
+  }), AuthModule, CoursesModule, CategoriesModule, OrdersModule],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
