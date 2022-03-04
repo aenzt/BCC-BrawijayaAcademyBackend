@@ -6,14 +6,22 @@ export class Order{
     orderId: string;
 
     @Column()
+    courseId: number;
+
+    @Column({
+        type: 'bigint',
+    })
+    userId: number;
+
+    @Column()
     transcationId: string;
 
     @Column()
     transcationStatus: string;
 
     @Column()
-    orderAt: Date;
+    totalPrice: number;
 
     @Column()
-    totalPrice: number;
+    orderAt: Date;
 }

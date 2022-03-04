@@ -1,5 +1,5 @@
 import { Exclude } from "class-transformer";
-import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { ApiProperty } from "@nestjs/swagger";
 import { Course } from "src/courses/entities/course.entity";
@@ -38,6 +38,9 @@ export class User {
     @ManyToMany(() => Course, course => course.user)
     @JoinTable()
     coursesOwned : Course[];
+
+    @OneToMany(() => Course, course => course.author)
+    courseCreated : Course[];
 
     @BeforeInsert()
     async hashPassword(){
