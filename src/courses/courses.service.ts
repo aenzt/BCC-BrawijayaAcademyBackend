@@ -45,9 +45,9 @@ export class CoursesService {
     course.categories = [category];
     const created = await this.courseRepository.save(course);
     return {
-        message: 'Create course success',
-        data: created
-    }
+      message: 'Create course success',
+      data: created,
+    };
   }
 
   async findAll() {
@@ -79,15 +79,15 @@ export class CoursesService {
       const user = await this.userService.findOne(+nim);
       if (await this.userService.checkCourse(user, course)) {
         const courseOwned = instanceToPlain(course, { groups: ['owned'] });
-        return { 
-            data: courseOwned,
-            message: 'Get course success',
-         };
+        return {
+          data: courseOwned,
+          message: 'Get course success',
+        };
       }
     }
-    return { 
-        data: course,
-        message: 'Get course success', 
+    return {
+      data: course,
+      message: 'Get course success',
     };
   }
 
@@ -104,13 +104,19 @@ export class CoursesService {
     return course;
   }
 
-  async update(id: number, updateCourseDto: UpdateCourseDto) {
+  async update(id: number, updateCourseDto: UpdateCourseDto, nim: string) {
     const course = await this.courseRepository.findOne(id);
     if (!course) {
       throw new HttpException(
         `Course with id ${id} not found`,
         HttpStatus.NOT_FOUND,
       );
+    }
+    if(course.author.nim !== +nim){
+        throw new HttpException(
+            `You are not the author of this course`,
+            HttpStatus.BAD_REQUEST,
+            );
     }
     if (updateCourseDto.name) {
       course.name = updateCourseDto.name;
@@ -128,7 +134,7 @@ export class CoursesService {
     return this.courseRepository.save(course);
   }
 
-  async remove(id: number) {
+  async remove(id: number, nim: string) {
     const course = await this.courseRepository.findOne(id);
     if (!course) {
       throw new HttpException(
@@ -136,11 +142,17 @@ export class CoursesService {
         HttpStatus.NOT_FOUND,
       );
     }
+    if(course.author.nim !== +nim){
+        throw new HttpException(
+            `You are not the author of this course`,
+            HttpStatus.BAD_REQUEST,
+            );
+    }
     const removed = await this.courseRepository.remove(course);
     return {
-        message: 'Delete course success',
-        data : removed
-    }
+      message: 'Delete course success',
+      data: removed,
+    };
   }
 
   async buy(id: number, nim: string) {
@@ -207,11 +219,11 @@ export class CoursesService {
     await this.orderService.create(order);
 
     return {
-        data : {
-            qrCode: chargeRes.actions[0].url,
-            deeplinkRedirect: chargeRes.actions[1].url,
-        },
-        message: 'Issued QR Code Succcess',
+      data: {
+        qrCode: chargeRes.actions[0].url,
+        deeplinkRedirect: chargeRes.actions[1].url,
+      },
+      message: 'Issued QR Code Succcess',
     };
   }
 }

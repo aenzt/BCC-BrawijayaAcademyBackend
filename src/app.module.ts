@@ -7,20 +7,19 @@ import { CoursesModule } from './courses/courses.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
 import { OrdersModule } from './orders/orders.module';
+import { Connection, getConnectionOptions } from 'typeorm';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, TypeOrmModule.forRoot({
-    type: 'mysql',
-    host: 'localhost',
-    port: 3306,
-    username: process.env.DATABASE_USERNAME,
-    database: process.env.DATABASE_NAME,
-    autoLoadEntities: true,
-    synchronize: true,
-  }), AuthModule, CoursesModule, CategoriesModule, OrdersModule],
+  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, CoursesModule, CategoriesModule, OrdersModule, TypeOrmModule.forRootAsync({
+    useFactory: async () =>
+      Object.assign(await getConnectionOptions(), {
+        autoLoadEntities: true,
+      }),
+  })],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
       consumer.apply(LoggerMiddleware).forRoutes('*');
   }
+  constructor(private connection: Connection) {}
 }

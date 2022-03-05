@@ -7,6 +7,7 @@ import * as puppeteer from 'puppeteer';
 import { CreateUserDto } from 'src/auth/dto/createUser.dto';
 import { loginUserDto } from 'src/auth/dto/loginUser.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Role } from 'src/users/entities/role.entity';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,8 @@ export class AuthService {
     private jwtService: JwtService,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(Role)
+    private readonly rolesRepository: Repository<Role>,
   ) {}
 
   async validateUser(nim: number, password: string): Promise<any> {
@@ -98,10 +101,31 @@ export class AuthService {
       createUserDto.nim.toString(),
       createUserDto.password,
     );
+    user.role = await this.rolesRepository.findOne({name: 'user'});
+    if(createUserDto.role){
+        user.role = await this.rolesRepository.findOne({name: createUserDto.role});
+    }
+    console.log(user.role);
     user.fullName = fullName;
     user.faculty = faculty;
     user.major = major;
     
     return this.usersRepository.save(user);
+  }
+
+  async seed() {
+    const roleInDb = await this.rolesRepository.find();
+    if (roleInDb.length > 0) {
+      throw new HttpException('Already Seeded', 400);
+    }
+    let role = new Role();
+    role.name = 'admin';
+    await this.rolesRepository.save(role);
+    role = new Role();
+    role.name = 'instructor';
+    await this.rolesRepository.save(role);
+    role = new Role();
+    role.name = 'user';
+    await this.rolesRepository.save(role);
   }
 }

@@ -32,7 +32,7 @@ export class Course {
     @ApiProperty()
     price : number;
 
-    @ManyToOne(() => User, user => user.courseCreated)
+    @ManyToOne(() => User, user => user.courseCreated, {onDelete: "SET NULL"})
     author: User
 
     @ManyToMany(() => User, user => user.coursesOwned)

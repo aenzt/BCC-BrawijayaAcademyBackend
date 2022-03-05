@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpStatus } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/auth/dto/createUser.dto';
 import { loginUserDto } from 'src/auth/dto/loginUser.dto';
@@ -25,5 +25,10 @@ export class AuthController {
   async postRegister(@Body() user: CreateUserDto) {
     const createdUser = await this.authService.create(user);
     return { statusCode: HttpStatus.CREATED, message: 'User created successfully', data: createdUser };
+  }
+
+  @Get('seed')
+  async seed() {
+      return this.authService.seed();
   }
 }
