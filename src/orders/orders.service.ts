@@ -42,7 +42,7 @@ export class OrdersService {
 
   async findAll(nim: number) {
     const order = await this.orderRepository.find({ userId: nim });
-    if (!order) {
+    if (!order || order.length < 1) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
     }
     return order;

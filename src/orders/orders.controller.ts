@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OrdersService } from './orders.service';
@@ -10,6 +10,9 @@ export class OrdersController {
 
   @Post('callback')
   update(@Body() order) {
+    if(!order.order_id){
+        throw new HttpException("Body not valid", HttpStatus.BAD_REQUEST);
+    }
     const orderId = order.order_id;
     const transactionStatus = order.transaction_status;
     return this.ordersService.update(orderId, transactionStatus);
