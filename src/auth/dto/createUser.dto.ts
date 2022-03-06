@@ -17,6 +17,6 @@ export class CreateUserDto {
     @IsEmail()
     email: string;
 
-    @ApiProperty()
+    @ApiProperty({default: 'user'})
     role?: string;
 }
