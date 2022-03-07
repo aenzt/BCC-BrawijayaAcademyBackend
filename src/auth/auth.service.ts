@@ -105,7 +105,6 @@ export class AuthService {
     if(createUserDto.role){
         user.role = await this.rolesRepository.findOne({name: createUserDto.role});
     }
-    console.log(user.role);
     user.fullName = fullName;
     user.faculty = faculty;
     user.major = major;
