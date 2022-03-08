@@ -8,12 +8,15 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { hasRoles } from 'src/auth/decorators/roles.decorator';
@@ -21,6 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
+import { JoinCourseDto } from './dto/join-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
 
@@ -30,6 +34,31 @@ import { Course } from './entities/course.entity';
 @ApiBearerAuth()
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all Course' })
+  @ApiQuery({ name: 'category', required: false })
+  @ApiQuery({ name: 'name', required: false })
+  @ApiCreatedResponse({ description: 'Get all course success' })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  findAll(@Query('category') category?: string, @Query('name') name?: string) {
+    return this.coursesService.findAll(category, name);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get one course' })
+  @ApiCreatedResponse({ description: 'Get one course success' })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  findOne(@Param('id') id: string, @Req() req) {
+    return this.coursesService.findOne(+id, req.user.nim);
+  }
+
+  @Get(':id/buy')
+  @ApiOperation({ summary: 'Buy Course by ID' })
+  @hasRoles('user', 'admin')
+  buy(@Param('id') id: string, @Req() req) {
+    return this.coursesService.buy(+id, req.user.nim);
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create Course' })
@@ -43,23 +72,14 @@ export class CoursesController {
     return this.coursesService.create(createCourseDto, req.user.nim);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all Course' })
-  @ApiCreatedResponse({ description: 'Get all course success' })
-  @ApiBadRequestResponse({ description: 'Bad Request' })
-  findAll() {
-    return this.coursesService.findAll();
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get one course' })
-  @ApiCreatedResponse({ description: 'Get one course success' })
-  @ApiBadRequestResponse({ description: 'Bad Request' })
-  findOne(@Param('id') id: string, @Req() req) {
-    return this.coursesService.findOne(+id, req.user.nim);
+  @Post(':id/joininstructor')
+  @hasRoles('instructor', 'admin')
+  joinInstructor(@Param('id') id: string, @Req() req, @Body() joinCourseDto:JoinCourseDto) {
+      return this.coursesService.joinInstructor(id, req.user.nim, joinCourseDto.joinCode);
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Edit one course for author' })
   @hasRoles('instructor', 'admin')
   update(
     @Param('id') id: string,
@@ -69,15 +89,27 @@ export class CoursesController {
     return this.coursesService.update(+id, updateCourseDto, req.user.nim);
   }
 
+  @Patch('admin/:id')
+  @ApiOperation({ summary: 'Edit one course for admin' })
+  @hasRoles('admin')
+  updateAdmin(
+    @Param('id') id: string,
+    @Body() updateCourseDto: UpdateCourseDto,
+  ) {
+    return this.coursesService.updateAdmin(+id, updateCourseDto);
+  }
+
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete one course for author' })
   @hasRoles('instructor', 'admin')
   remove(@Param('id') id: string, @Req() req) {
     return this.coursesService.remove(+id, req.user.nim);
   }
 
-  @Get(':id/buy')
-  @hasRoles('user', 'admin')
-  buy(@Param('id') id: string, @Req() req) {
-    return this.coursesService.buy(+id, req.user.nim);
+  @Delete('admin/:id')
+  @ApiOperation({ summary: 'Delete one course for admin' })
+  @hasRoles('admin')
+  removeAdmin(@Param('id') id: string) {
+    return this.coursesService.removeAdmin(+id);
   }
 }

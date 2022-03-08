@@ -1,5 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { hasRoles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -14,29 +23,37 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Post()
-  @hasRoles('instructor', 'admin')
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
-  }
-
   @Get()
+  @ApiOperation({ summary: 'Get all categories' })
   findAll() {
     return this.categoriesService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get one categories by ID' })
   findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Post()
+  @ApiOperation({ summary: 'Create categories' })
   @hasRoles('instructor', 'admin')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoriesService.create(createCategoryDto);
+  }
+  
+  @Patch(':id')
+  @ApiOperation({ summary: 'Edit one categories by ID' })
+  @hasRoles('instructor', 'admin')
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete one categories by ID' })
   @hasRoles('instructor', 'admin')
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);

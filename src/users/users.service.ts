@@ -16,8 +16,12 @@ export class UsersService {
 
   async findOne(nim: number): Promise<User | undefined> {
     return this.usersRepository.findOne(nim, {
-      relations: ['coursesOwned'],
+      relations: ['role', 'coursesOwned'],
     });
+  }
+
+  async findOneWithoutRelation(nim: number): Promise<User | undefined> {
+    return this.usersRepository.findOne(nim);
   }
 
   async update(nim: number, user: User): Promise<User> {
@@ -56,5 +60,21 @@ export class UsersService {
       }
     }
     return false;
+  }
+
+  async findAll(): Promise<User[]> {
+      return this.usersRepository.find({relations: ['role']});
+  }
+
+  async deleteUser(nim : number) {
+    const user = await this.usersRepository.findOne(nim);
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+    const removed = await this.usersRepository.remove(user);
+    return {
+        message: 'User deleted',
+        data : removed
+    }
   }
 }

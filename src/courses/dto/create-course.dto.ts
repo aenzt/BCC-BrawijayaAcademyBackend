@@ -11,12 +11,12 @@ export class CreateCourseDto {
     description : string;
 
     @ApiProperty()
-    @ValidateIf(o => o.courseBody)
+    @ValidateIf(o => o.body)
     @IsNotEmpty()
     body: string;
 
     @ApiProperty()
-    @ValidateIf(o => o.coursePlaylistLink)
+    @ValidateIf(o => o.playlistLink)
     @IsNotEmpty()
     @IsUrl()
     playlistLink: string;
@@ -26,5 +26,6 @@ export class CreateCourseDto {
     price: number;
 
     @ApiProperty()
+    @IsNotEmpty()
     categoryId : number;
 }

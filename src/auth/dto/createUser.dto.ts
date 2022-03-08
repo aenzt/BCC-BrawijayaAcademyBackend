@@ -17,6 +17,6 @@ export class CreateUserDto {
     @IsEmail()
     email: string;
 
-    @ApiProperty({default: 'user'})
+    @ApiProperty({enum: ['user', 'instructor', 'admin']})
     role?: string;
 }

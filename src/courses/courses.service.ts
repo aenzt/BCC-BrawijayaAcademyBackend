@@ -38,7 +38,7 @@ export class CoursesService {
     course.body = createCourseDto.body;
     course.playlistLink = createCourseDto.playlistLink;
     course.price = createCourseDto.price;
-    course.author = author;
+    course.author = [...course.author, author];
     const category = await this.categoryService.findOne(
       createCourseDto.categoryId,
     );
@@ -50,12 +50,22 @@ export class CoursesService {
     };
   }
 
-  async findAll() {
-    const course = await this.courseRepository.find({
+  async findAll(param?: string, name?: string) {
+    let course = await this.courseRepository.find({
       relations: ['categories', 'author'],
     });
     if (course.length < 1) {
       throw new HttpException('No course found', HttpStatus.NOT_FOUND);
+    }
+    if (param) {
+      course = await this.courseRepository
+        .createQueryBuilder('course')
+        .leftJoin('course.categories', 'category')
+        .where('category.name = :name', { name: param })
+        .getMany();
+      if (course.length < 1) {
+        throw new HttpException('No course found', HttpStatus.NOT_FOUND);
+      }
     }
     return {
       message: 'Get all course success',
@@ -106,17 +116,18 @@ export class CoursesService {
 
   async update(id: number, updateCourseDto: UpdateCourseDto, nim: string) {
     const course = await this.courseRepository.findOne(id);
+    const user = await this.userService.findOne(+nim);
     if (!course) {
       throw new HttpException(
         `Course with id ${id} not found`,
         HttpStatus.NOT_FOUND,
       );
     }
-    if(course.author.nim !== +nim){
-        throw new HttpException(
-            `You are not the author of this course`,
-            HttpStatus.BAD_REQUEST,
-            );
+    if (!course.author.includes(user)) {
+      throw new HttpException(
+        `You are not the author of this course`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (updateCourseDto.name) {
       course.name = updateCourseDto.name;
@@ -130,11 +141,37 @@ export class CoursesService {
     if (updateCourseDto.playlistLink) {
       course.playlistLink = updateCourseDto.playlistLink;
     }
+    if (updateCourseDto.author) {
+      const newAuthor = await this.userService.findOne(updateCourseDto.author);
+      course.author = [...course.author, newAuthor];
+    }
 
     return this.courseRepository.save(course);
   }
 
   async remove(id: number, nim: string) {
+    const course = await this.courseRepository.findOne(id);
+    const user = await this.userService.findOne(+nim);
+    if (!course) {
+      throw new HttpException(
+        `Course with id ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (!course.author.includes(user)) {
+      throw new HttpException(
+        `You are not the author of this course`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const removed = await this.courseRepository.remove(course);
+    return {
+      message: 'Delete course success',
+      data: removed,
+    };
+  }
+
+  async updateAdmin(id: number, updateCourseDto: UpdateCourseDto) {
     const course = await this.courseRepository.findOne(id);
     if (!course) {
       throw new HttpException(
@@ -142,17 +179,66 @@ export class CoursesService {
         HttpStatus.NOT_FOUND,
       );
     }
-    if(course.author.nim !== +nim){
-        throw new HttpException(
-            `You are not the author of this course`,
-            HttpStatus.BAD_REQUEST,
-            );
+    if (updateCourseDto.name) {
+      course.name = updateCourseDto.name;
+    }
+    if (updateCourseDto.description) {
+      course.description = updateCourseDto.description;
+    }
+    if (updateCourseDto.body) {
+      course.body = updateCourseDto.body;
+    }
+    if (updateCourseDto.playlistLink) {
+      course.playlistLink = updateCourseDto.playlistLink;
+    }
+    if (updateCourseDto.author) {
+      const newAuthor = await this.userService.findOne(updateCourseDto.author);
+      course.author = [...course.author, newAuthor];
+    }
+
+    return this.courseRepository.save(course);
+  }
+
+  async removeAdmin(id: number) {
+    const course = await this.courseRepository.findOne(id);
+    if (!course) {
+      throw new HttpException(
+        `Course with id ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
     }
     const removed = await this.courseRepository.remove(course);
     return {
       message: 'Delete course success',
       data: removed,
     };
+  }
+
+  async joinInstructor(id: string, nim: string, uniqueCode: string) {
+    const course = await this.courseRepository.findOne(+id, {relations: ['author']});
+    if (!course) {
+      throw new HttpException(
+        `Course with id ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (uniqueCode === course.joinCode) {
+      const user = await this.userService.findOneWithoutRelation(+nim);
+      if(course.author.find((c) => c.nim === user.nim)) {
+        throw new HttpException(
+          `You are already the author of this course`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      course.author = [...course.author, user];
+      const saved = await this.courseRepository.save(course);
+      return {
+          message: 'Join instructor success',
+          data: saved
+      }
+    } else {
+      throw new HttpException('Invalid unique code', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async buy(id: number, nim: string) {

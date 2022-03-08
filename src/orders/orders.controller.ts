@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OrdersService } from './orders.service';
 
@@ -8,7 +8,24 @@ import { OrdersService } from './orders.service';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({summary: "Get all order by logged in user" })
+  get(@Req() req) {
+    return this.ordersService.findAll(req.user.nim);
+  }
+
+  @Get(':id')
+  @ApiOperation({summary: "Get one order by logged in user" })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  getOne(@Param('id') id: string, @Req() req) {
+    return this.ordersService.findOne(req.user.nim, id);
+  }
+  
   @Post('callback')
+  @ApiOperation({summary: "For Midtrans Use Only!" })
   update(@Body() order) {
     if(!order.order_id){
         throw new HttpException("Body not valid", HttpStatus.BAD_REQUEST);
@@ -18,17 +35,4 @@ export class OrdersController {
     return this.ordersService.update(orderId, transactionStatus);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Get()
-  get(@Req() req) {
-    return this.ordersService.findAll(req.user.nim);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Get(':id')
-  getOne(@Param('id') id: string, @Req() req) {
-    return this.ordersService.findOne(req.user.nim, id);
-  }
 }

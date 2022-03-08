@@ -2,7 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Exclude, Expose } from "class-transformer";
 import { Category } from "src/categories/entities/category.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import * as Randomstring from "randomstring";
 
 @Entity()
 export class Course {
@@ -32,13 +33,21 @@ export class Course {
     @ApiProperty()
     price : number;
 
-    @ManyToOne(() => User, user => user.courseCreated, {onDelete: "SET NULL"})
-    author: User
+    @Column({})
+    joinCode : string;
+
+    @ManyToMany(() => User, user => user.courseCreated)
+    author: User[]
 
     @ManyToMany(() => User, user => user.coursesOwned)
     user: User[];
 
-    @ManyToMany(() => Category, category => category.courses)
+    @ManyToMany(() => Category, category => category.courses, {eager: true})
     categories: Category[];
+
+    @BeforeInsert()
+    randomCode(){
+        this.joinCode = Randomstring.generate(8);
+    }
 
 }

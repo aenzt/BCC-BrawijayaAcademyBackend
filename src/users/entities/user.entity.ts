@@ -40,7 +40,8 @@ export class User {
     @JoinTable()
     coursesOwned : Course[];
 
-    @OneToMany(() => Course, course => course.author)
+    @ManyToMany(() => Course, course => course.author)
+    @JoinTable()
     courseCreated : Course[];
 
     @ManyToOne(() => Role, role => role.users)
