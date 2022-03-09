@@ -38,7 +38,7 @@ export class CoursesService {
     course.body = createCourseDto.body;
     course.playlistLink = createCourseDto.playlistLink;
     course.price = createCourseDto.price;
-    course.author = [...course.author, author];
+    course.author = [author];
     const category = await this.categoryService.findOne(
       createCourseDto.categoryId,
     );

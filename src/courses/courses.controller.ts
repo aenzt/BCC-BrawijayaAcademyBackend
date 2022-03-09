@@ -18,10 +18,13 @@ import {
   ApiOperation,
   ApiQuery,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { hasRoles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { BaseResponseDTO } from 'src/responseDto/baseResponse.dto';
+import { ErrorResponseDTO } from 'src/responseDto/errorResponse.dto';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { JoinCourseDto } from './dto/join-course.dto';
@@ -32,6 +35,8 @@ import { Course } from './entities/course.entity';
 @ApiTags('courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'Unauthorized', type: ErrorResponseDTO })
+@ApiBadRequestResponse({ description: 'Bad Request', type: ErrorResponseDTO })
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
@@ -39,16 +44,14 @@ export class CoursesController {
   @ApiOperation({ summary: 'Get all Course' })
   @ApiQuery({ name: 'category', required: false })
   @ApiQuery({ name: 'name', required: false })
-  @ApiCreatedResponse({ description: 'Get all course success' })
-  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiCreatedResponse({ description: 'Get all course success', type: BaseResponseDTO })
   findAll(@Query('category') category?: string, @Query('name') name?: string) {
     return this.coursesService.findAll(category, name);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get one course' })
-  @ApiCreatedResponse({ description: 'Get one course success' })
-  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiCreatedResponse({ description: 'Get one course success', type: BaseResponseDTO })
   findOne(@Param('id') id: string, @Req() req) {
     return this.coursesService.findOne(+id, req.user.nim);
   }
@@ -66,7 +69,6 @@ export class CoursesController {
     description: 'User created successfully',
     type: Course,
   })
-  @ApiBadRequestResponse({ description: 'Bad Request' })
   @hasRoles('instructor', 'admin')
   create(@Body() createCourseDto: CreateCourseDto, @Req() req) {
     return this.coursesService.create(createCourseDto, req.user.nim);

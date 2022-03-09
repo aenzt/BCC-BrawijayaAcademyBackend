@@ -11,16 +11,19 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { hasRoles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ErrorResponseDTO } from 'src/responseDto/errorResponse.dto';
 import { UsersService } from './users.service';
 
 @Controller()
 @ApiTags('user')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'Unauthorized', type: ErrorResponseDTO })
+@ApiBadRequestResponse({ description: 'Bad Request', type: ErrorResponseDTO })
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 

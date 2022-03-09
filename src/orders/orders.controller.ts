@@ -1,10 +1,13 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ErrorResponseDTO } from 'src/responseDto/errorResponse.dto';
 import { OrdersService } from './orders.service';
 
 @ApiTags('orders')
 @Controller('orders')
+@ApiUnauthorizedResponse({ description: 'Unauthorized', type: ErrorResponseDTO })
+@ApiBadRequestResponse({ description: 'Bad Request', type: ErrorResponseDTO })
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 

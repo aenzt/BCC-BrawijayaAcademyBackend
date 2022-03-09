@@ -12,21 +12,21 @@ export class Course {
     id: number;
 
     @Column()
-    @ApiProperty()
+    @ApiProperty({example: 'Course 1', description: 'Course name'})
     name: string;
 
     @Column()
-    @ApiProperty()
+    @ApiProperty({example: 'Course 1 Description', description: 'Course Description'})
     description: string;
 
     @Column({type: 'text', nullable: true})
     @Expose({groups: ['owned']})
-    @ApiProperty()
+    @ApiProperty({nullable: true, description: 'Course Body'})
     body: string;
 
     @Column({nullable: true})
     @Expose({groups: ['owned']})
-    @ApiProperty()
+    @ApiProperty({nullable: true, description: 'Course Playlist Link', example: 'https://www.youtube.com/playlist?v=dQw4w9WgXcQ'})
     playlistLink : string;
 
     @Column()
@@ -34,6 +34,7 @@ export class Course {
     price : number;
 
     @Column({})
+    @Exclude()
     joinCode : string;
 
     @ManyToMany(() => User, user => user.courseCreated)
