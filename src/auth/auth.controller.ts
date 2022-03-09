@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, HttpStatus, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/auth/dto/createUser.dto';
 import { loginUserDto } from 'src/auth/dto/loginUser.dto';
 import { User } from 'src/users/entities/user.entity';
@@ -32,6 +32,7 @@ export class AuthController {
 
   @Get('seed')
   @ApiOperation({summary: "Seed categories table for FIRST TIME USE ONLY" })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @hasRoles('admin')
   async seed() {

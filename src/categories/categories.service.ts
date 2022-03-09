@@ -32,7 +32,7 @@ export class CategoriesService {
   async findAll() {
     const categories = await this.categoryRepository.find();
     if (categories.length < 1) {
-        throw new HttpException('No course found', HttpStatus.NOT_FOUND);
+        throw new HttpException('No categories found', HttpStatus.NOT_FOUND);
       }
       return {
         data: categories,
