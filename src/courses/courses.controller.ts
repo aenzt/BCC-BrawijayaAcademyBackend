@@ -42,10 +42,10 @@ export class CoursesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all Course' })
-  @ApiQuery({ name: 'category', required: false })
-  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'Category', required: false })
+  @ApiQuery({ name: 'CourseName', required: false })
   @ApiCreatedResponse({ description: 'Get all course success', type: BaseResponseDTO })
-  findAll(@Query('category') category?: string, @Query('name') name?: string) {
+  findAll(@Query('Category') category?: string, @Query('CourseName') name?: string) {
     return this.coursesService.findAll(category, name);
   }
 

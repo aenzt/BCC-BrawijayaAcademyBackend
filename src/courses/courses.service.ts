@@ -57,11 +57,34 @@ export class CoursesService {
     if (course.length < 1) {
       throw new HttpException('No course found', HttpStatus.NOT_FOUND);
     }
-    if (param) {
+    if (param && name) {
+      console.log(param, name);
       course = await this.courseRepository
         .createQueryBuilder('course')
-        .leftJoin('course.categories', 'category')
-        .where('category.name = :name', { name: param })
+        .leftJoinAndSelect('course.categories', 'category')
+        .leftJoinAndSelect('course.author', 'author')
+        .where('course.name like :name', { name: `%${name}%` })
+        .andWhere('category.name = :catName', { catName: param })
+        .getMany();
+      if (course.length < 1) {
+        throw new HttpException('No course found', HttpStatus.NOT_FOUND);
+      }
+    } else if (param) {
+      course = await this.courseRepository
+        .createQueryBuilder('course')
+        .leftJoinAndSelect('course.categories', 'category')
+        .leftJoinAndSelect('course.author', 'author')
+        .where('category.name = :catName', { catName: param })
+        .getMany();
+      if (course.length < 1) {
+        throw new HttpException('No course found', HttpStatus.NOT_FOUND);
+      }
+    } else if (name) {
+      course = await this.courseRepository
+        .createQueryBuilder('course')
+        .leftJoinAndSelect('course.categories', 'category')
+        .leftJoinAndSelect('course.author', 'author')
+        .where('course.name like :name', { name: `%${name}%` })
         .getMany();
       if (course.length < 1) {
         throw new HttpException('No course found', HttpStatus.NOT_FOUND);
@@ -215,7 +238,9 @@ export class CoursesService {
   }
 
   async joinInstructor(id: string, nim: string, uniqueCode: string) {
-    const course = await this.courseRepository.findOne(+id, {relations: ['author']});
+    const course = await this.courseRepository.findOne(+id, {
+      relations: ['author'],
+    });
     if (!course) {
       throw new HttpException(
         `Course with id ${id} not found`,
@@ -224,7 +249,7 @@ export class CoursesService {
     }
     if (uniqueCode === course.joinCode) {
       const user = await this.userService.findOneWithoutRelation(+nim);
-      if(course.author.find((c) => c.nim === user.nim)) {
+      if (course.author.find((c) => c.nim === user.nim)) {
         throw new HttpException(
           `You are already the author of this course`,
           HttpStatus.BAD_REQUEST,
@@ -233,9 +258,9 @@ export class CoursesService {
       course.author = [...course.author, user];
       const saved = await this.courseRepository.save(course);
       return {
-          message: 'Join instructor success',
-          data: saved
-      }
+        message: 'Join instructor success',
+        data: saved,
+      };
     } else {
       throw new HttpException('Invalid unique code', HttpStatus.BAD_REQUEST);
     }
