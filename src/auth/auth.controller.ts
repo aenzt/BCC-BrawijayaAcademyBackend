@@ -29,13 +29,4 @@ export class AuthController {
     const createdUser = await this.authService.create(user);
     return { statusCode: HttpStatus.CREATED, message: 'User created successfully', data: createdUser };
   }
-
-  @Get('seed')
-  @ApiOperation({summary: "Seed categories table for FIRST TIME USE ONLY" })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @hasRoles('admin')
-  async seed() {
-      return this.authService.seed();
-  }
 }

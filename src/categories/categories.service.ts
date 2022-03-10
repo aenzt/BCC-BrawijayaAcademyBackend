@@ -30,7 +30,7 @@ export class CategoriesService {
   }
 
   async findAll() {
-    const categories = await this.categoryRepository.find();
+    const categories = await this.categoryRepository.find({order: {id: "ASC"}});
     if (categories.length < 1) {
         throw new HttpException('No categories found', HttpStatus.NOT_FOUND);
       }

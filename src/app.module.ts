@@ -10,12 +10,7 @@ import { OrdersModule } from './orders/orders.module';
 import { Connection, getConnectionOptions } from 'typeorm';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, CoursesModule, CategoriesModule, OrdersModule, TypeOrmModule.forRootAsync({
-    useFactory: async () =>
-      Object.assign(await getConnectionOptions(), {
-        autoLoadEntities: true,
-      }),
-  })],
+  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, CoursesModule, CategoriesModule, OrdersModule, TypeOrmModule.forRoot()],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {

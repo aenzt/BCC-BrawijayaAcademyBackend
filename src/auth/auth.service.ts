@@ -111,20 +111,4 @@ export class AuthService {
     
     return this.usersRepository.save(user);
   }
-
-  async seed() {
-    const roleInDb = await this.rolesRepository.find();
-    if (roleInDb.length > 0) {
-      throw new HttpException('Already Seeded', 400);
-    }
-    let role = new Role();
-    role.name = 'admin';
-    await this.rolesRepository.save(role);
-    role = new Role();
-    role.name = 'instructor';
-    await this.rolesRepository.save(role);
-    role = new Role();
-    role.name = 'user';
-    await this.rolesRepository.save(role);
-  }
 }

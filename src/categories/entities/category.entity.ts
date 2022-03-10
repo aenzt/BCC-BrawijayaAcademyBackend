@@ -17,7 +17,7 @@ export class Category {
     courses : Course[];
 
     @BeforeInsert()
-    toLowerCase(){
+    toUpperCase(){
         this.name = this.name.toUpperCase();
     }
 }
