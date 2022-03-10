@@ -7,11 +7,9 @@ import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector))
-  );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.use(helmet());
-  app.enableCors({preflightContinue: true, credentials: true,  origin: /.+/ });
+  app.enableCors({ credentials: true, origin: true, allowedHeaders:"Content-Type, Accept" });
   const config = new DocumentBuilder()
     .setTitle('Filkom Academy')
     .setDescription('The Filkom Academy API')
