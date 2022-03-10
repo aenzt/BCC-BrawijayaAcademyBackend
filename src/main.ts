@@ -11,7 +11,7 @@ async function bootstrap() {
     new ClassSerializerInterceptor(app.get(Reflector))
   );
   app.use(helmet());
-  app.enableCors({preflightContinue: true, credentials: true});
+  app.enableCors({preflightContinue: true, credentials: true,  origin: /.+/ });
   const config = new DocumentBuilder()
     .setTitle('Filkom Academy')
     .setDescription('The Filkom Academy API')
