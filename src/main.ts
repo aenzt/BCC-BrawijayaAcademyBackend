@@ -9,7 +9,12 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.use(helmet());
-  app.enableCors({ credentials: true, origin: true, allowedHeaders:"Content-Type, Accept, access-control-allow-origin, Authorization" });
+  app.enableCors({
+    credentials: true,
+    origin: true,
+    allowedHeaders:
+      'Content-Type, Accept, access-control-allow-origin, Authorization',
+  });
   const config = new DocumentBuilder()
     .setTitle('Filkom Academy')
     .setDescription('The Filkom Academy API')

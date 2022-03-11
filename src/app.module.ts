@@ -7,10 +7,11 @@ import { CoursesModule } from './courses/courses.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
 import { OrdersModule } from './orders/orders.module';
-import { Connection, getConnectionOptions } from 'typeorm';
+import { Connection } from 'typeorm';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, CoursesModule, CategoriesModule, OrdersModule, TypeOrmModule.forRoot()],
+  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, CoursesModule, CategoriesModule, OrdersModule, TypeOrmModule.forRoot(), ChatModule],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
