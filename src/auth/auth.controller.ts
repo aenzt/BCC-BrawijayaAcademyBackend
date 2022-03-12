@@ -5,10 +5,10 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/auth/dto/createUser.dto';
-import { loginUserDto } from 'src/auth/dto/loginUser.dto';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from './dto/createUser.dto';
+import { loginUserDto } from './dto/loginUser.dto';
 
 @ApiTags('auth')
 @Controller('auth')
