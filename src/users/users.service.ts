@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from 'src/courses/entities/course.entity';
-import { Connection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Role } from './entities/role.entity';
 import { User } from './entities/user.entity';
 
@@ -63,18 +63,37 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-      return this.usersRepository.find({relations: ['role']});
+    return this.usersRepository.find({ relations: ['role'] });
   }
 
-  async deleteUser(nim : number) {
+  async deleteUser(nim: number) {
     const user = await this.usersRepository.findOne(nim);
     if (!user) {
       throw new HttpException('User not found', 404);
     }
     const removed = await this.usersRepository.remove(user);
     return {
-        message: 'User deleted',
-        data : removed
+      message: 'User deleted',
+      data: removed,
+    };
+  }
+
+  async updateRole(role: string, nim: string) {
+    const user = await this.usersRepository.findOne(+nim, {
+      relations: ['role'],
+    });
+    if (!user) {
+      throw new HttpException('User not found', 404);
     }
+    const roleToUpdate = await this.rolesRepository.findOne({ name: role });
+    if (!roleToUpdate) {
+      throw new HttpException('Role not found', 404);
+    }
+    user.role = roleToUpdate;
+    const updated = await this.usersRepository.save(user);
+    return {
+      message: 'User role updated',
+      data: updated,
+    };
   }
 }

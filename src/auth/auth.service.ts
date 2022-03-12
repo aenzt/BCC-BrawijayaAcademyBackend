@@ -35,8 +35,8 @@ export class AuthService {
   async login(loginDto: loginUserDto) {
     const user = await this.validateUser(loginDto.nim, loginDto.password);
     if (!user) {
-        throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
-      }
+      throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
+    }
     const payload = { sub: user.nim, email: user.email };
     return {
       statusCode: HttpStatus.OK,
@@ -50,7 +50,9 @@ export class AuthService {
   }
 
   private async checkSiam(username: string, password: string) {
-    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
     await page.goto('https://siam.ub.ac.id/', { waitUntil: 'networkidle2' });
 
@@ -101,14 +103,16 @@ export class AuthService {
       createUserDto.nim.toString(),
       createUserDto.password,
     );
-    user.role = await this.rolesRepository.findOne({name: 'user'});
-    if(createUserDto.role){
-        user.role = await this.rolesRepository.findOne({name: createUserDto.role});
+    user.role = await this.rolesRepository.findOne({ name: 'user' });
+    if (createUserDto.role) {
+      user.role = await this.rolesRepository.findOne({
+        name: createUserDto.role,
+      });
     }
     user.fullName = fullName;
     user.faculty = faculty;
     user.major = major;
-    
+
     return this.usersRepository.save(user);
   }
 }

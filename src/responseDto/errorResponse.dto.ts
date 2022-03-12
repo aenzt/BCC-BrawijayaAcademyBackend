@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
-export  class ErrorResponseDTO  {
-    @ApiProperty({default: '400'})
-    statusCode: number;
-    @ApiProperty()
-    message: string;
+export class ErrorResponseDTO {
+  @ApiProperty({ default: '400' })
+  statusCode: number;
+  @ApiProperty()
+  message: string;
 }

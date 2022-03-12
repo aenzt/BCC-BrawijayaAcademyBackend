@@ -10,10 +10,15 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { CoursesModule } from 'src/courses/courses.module';
 
 @Module({
-  imports: [CoursesModule, UsersModule, PassportModule, JwtModule.register({
-    secret: jwtConstants.secret,
-    signOptions: { expiresIn: '1d' },
-  })],
+  imports: [
+    CoursesModule,
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '1d' },
+    }),
+  ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
 })

@@ -37,3 +37,5 @@ lerna-debug.log*
 .history
 .vscode
 .env
+src/auth/constant.ts
+

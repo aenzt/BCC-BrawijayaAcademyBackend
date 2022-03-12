@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -7,11 +6,18 @@ import {
   HttpStatus,
   Param,
   Patch,
-  Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { hasRoles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -22,27 +28,36 @@ import { UsersService } from './users.service';
 @ApiTags('user')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-@ApiUnauthorizedResponse({ description: 'Unauthorized', type: ErrorResponseDTO })
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized',
+  type: ErrorResponseDTO,
+})
 @ApiBadRequestResponse({ description: 'Bad Request', type: ErrorResponseDTO })
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get('/profile')
-  @ApiOperation({summary: "Get logged in user profile" })
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get logged in user profile' })
   getProfile(@Req() req) {
     return this.userService.findOne(req.user.nim);
   }
 
+  @Patch('/profile/:id')
+  @hasRoles('admin')
+  @ApiQuery({ name: 'role', enum: ['admin', 'instructor', 'user'] })
+  editRole(@Query('role') role: string, @Req() req, @Param('id') id: string) {
+    return this.userService.updateRole(role, id);
+  }
+
   @Get('/user')
-  @ApiOperation({summary: "Get all user for ADMIN ONLY" })
+  @ApiOperation({ summary: 'Get all user for ADMIN ONLY' })
   @hasRoles('admin')
   findAll() {
     return this.userService.findAll();
   }
 
   @Get('user/:id')
-  @ApiOperation({summary: "Get one user by ID for ADMIN ONLY" })
+  @ApiOperation({ summary: 'Get one user by ID for ADMIN ONLY' })
   @hasRoles('admin')
   async findOne(@Param('id') id: string) {
     const user = await this.userService.findOne(+id);
@@ -53,14 +68,14 @@ export class UsersController {
   }
 
   @Patch('user/:id')
-  @ApiOperation({summary: "Edit one user by ID for ADMIN ONLY" })
+  @ApiOperation({ summary: 'Edit one user by ID for ADMIN ONLY' })
   @hasRoles('admin')
   update(@Param('id') id: string) {
     return 'Update user not allowed';
   }
 
   @Delete('user/:id')
-  @ApiOperation({summary: "Delete one user by ID for ADMIN ONLY" })
+  @ApiOperation({ summary: 'Delete one user by ID for ADMIN ONLY' })
   @hasRoles('admin')
   delete(@Param('id') id: string) {
     return this.userService.deleteUser(+id);

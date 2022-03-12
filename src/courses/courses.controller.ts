@@ -13,7 +13,6 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiBody,
   ApiCreatedResponse,
   ApiOperation,
   ApiQuery,
@@ -35,7 +34,10 @@ import { Course } from './entities/course.entity';
 @ApiTags('courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-@ApiUnauthorizedResponse({ description: 'Unauthorized', type: ErrorResponseDTO })
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized',
+  type: ErrorResponseDTO,
+})
 @ApiBadRequestResponse({ description: 'Bad Request', type: ErrorResponseDTO })
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
@@ -44,14 +46,23 @@ export class CoursesController {
   @ApiOperation({ summary: 'Get all Course' })
   @ApiQuery({ name: 'Category', required: false })
   @ApiQuery({ name: 'CourseName', required: false })
-  @ApiCreatedResponse({ description: 'Get all course success', type: BaseResponseDTO })
-  findAll(@Query('Category') category?: string, @Query('CourseName') name?: string) {
+  @ApiCreatedResponse({
+    description: 'Get all course success',
+    type: BaseResponseDTO,
+  })
+  findAll(
+    @Query('Category') category?: string,
+    @Query('CourseName') name?: string,
+  ) {
     return this.coursesService.findAll(category, name);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get one course' })
-  @ApiCreatedResponse({ description: 'Get one course success', type: BaseResponseDTO })
+  @ApiCreatedResponse({
+    description: 'Get one course success',
+    type: BaseResponseDTO,
+  })
   findOne(@Param('id') id: string, @Req() req) {
     return this.coursesService.findOne(+id, req.user.nim);
   }
@@ -76,8 +87,16 @@ export class CoursesController {
 
   @Post(':id/joininstructor')
   @hasRoles('instructor', 'admin')
-  joinInstructor(@Param('id') id: string, @Req() req, @Body() joinCourseDto:JoinCourseDto) {
-      return this.coursesService.joinInstructor(id, req.user.nim, joinCourseDto.joinCode);
+  joinInstructor(
+    @Param('id') id: string,
+    @Req() req,
+    @Body() joinCourseDto: JoinCourseDto,
+  ) {
+    return this.coursesService.joinInstructor(
+      id,
+      req.user.nim,
+      joinCourseDto.joinCode,
+    );
   }
 
   @Patch(':id')

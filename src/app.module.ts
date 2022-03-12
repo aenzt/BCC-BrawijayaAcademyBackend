@@ -11,11 +11,20 @@ import { Connection } from 'typeorm';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, CoursesModule, CategoriesModule, OrdersModule, TypeOrmModule.forRoot(), ChatModule],
+  imports: [
+    ConfigModule.forRoot(),
+    UsersModule,
+    AuthModule,
+    CoursesModule,
+    CategoriesModule,
+    OrdersModule,
+    TypeOrmModule.forRoot(),
+    ChatModule,
+  ],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-      consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes('*');
   }
   constructor(private connection: Connection) {}
 }

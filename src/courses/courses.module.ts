@@ -8,9 +8,14 @@ import { OrdersModule } from 'src/orders/orders.module';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Course]), CategoriesModule, UsersModule, forwardRef(() => OrdersModule)],
+  imports: [
+    TypeOrmModule.forFeature([Course]),
+    CategoriesModule,
+    UsersModule,
+    forwardRef(() => OrdersModule),
+  ],
   controllers: [CoursesController],
   providers: [CoursesService],
-  exports: [CoursesService, TypeOrmModule]
+  exports: [CoursesService, TypeOrmModule],
 })
 export class CoursesModule {}

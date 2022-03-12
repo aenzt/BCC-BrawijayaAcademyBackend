@@ -1,12 +1,14 @@
-import { Body, Controller, Get, Post, HttpStatus, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateUserDto } from 'src/auth/dto/createUser.dto';
 import { loginUserDto } from 'src/auth/dto/loginUser.dto';
 import { User } from 'src/users/entities/user.entity';
 import { AuthService } from './auth.service';
-import { hasRoles } from './decorators/roles.decorator';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { RolesGuard } from './guards/roles.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -15,8 +17,8 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'User Login' })
-  @ApiCreatedResponse({ description: 'Login Success'})
-  @ApiBadRequestResponse({ description: 'Bad Request'})
+  @ApiCreatedResponse({ description: 'Login Success' })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
   async login(@Body() user: loginUserDto) {
     return this.authService.login(user);
   }
@@ -27,6 +29,10 @@ export class AuthController {
   @ApiBadRequestResponse({ description: 'Bad Request' })
   async postRegister(@Body() user: CreateUserDto) {
     const createdUser = await this.authService.create(user);
-    return { statusCode: HttpStatus.CREATED, message: 'User created successfully', data: createdUser };
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User created successfully',
+      data: createdUser,
+    };
   }
 }

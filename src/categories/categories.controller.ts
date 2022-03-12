@@ -8,7 +8,13 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { hasRoles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -21,7 +27,10 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 @Controller('categories')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-@ApiUnauthorizedResponse({ description: 'Unauthorized', type: ErrorResponseDTO })
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized',
+  type: ErrorResponseDTO,
+})
 @ApiBadRequestResponse({ description: 'Bad Request', type: ErrorResponseDTO })
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
@@ -44,7 +53,7 @@ export class CategoriesController {
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
-  
+
   @Patch(':id')
   @ApiOperation({ summary: 'Edit one categories by ID' })
   @hasRoles('instructor', 'admin')
