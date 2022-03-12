@@ -1,24 +1,24 @@
 import {
   Controller,
+  UseGuards,
   Get,
+  Param,
   Post,
   Body,
   Patch,
-  Param,
   Delete,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiOperation,
   ApiTags,
+  ApiBearerAuth,
   ApiUnauthorizedResponse,
+  ApiBadRequestResponse,
+  ApiOperation,
 } from '@nestjs/swagger';
-import { hasRoles } from 'src/auth/decorators/roles.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { ErrorResponseDTO } from 'src/responseDto/errorResponse.dto';
+import { hasRoles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { ErrorResponseDTO } from '../responseDto/errorResponse.dto';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';

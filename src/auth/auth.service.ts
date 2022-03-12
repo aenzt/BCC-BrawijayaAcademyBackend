@@ -1,13 +1,14 @@
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
-import { UsersService } from '../users/users.service';
-import * as puppeteer from 'puppeteer';
-import { CreateUserDto } from 'src/auth/dto/createUser.dto';
-import { loginUserDto } from 'src/auth/dto/loginUser.dto';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Role } from 'src/users/entities/role.entity';
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Role } from "../users/entities/role.entity";
+import { User } from "../users/entities/user.entity";
+import { UsersService } from "../users/users.service";
+import { CreateUserDto } from "./dto/createUser.dto";
+import { loginUserDto } from "./dto/loginUser.dto";
+import * as puppeteer from "puppeteer";
+
 
 @Injectable()
 export class AuthService {

@@ -1,9 +1,9 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiOperation,
   ApiTags,
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { User } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
