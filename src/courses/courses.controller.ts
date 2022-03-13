@@ -14,6 +14,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiTags,
@@ -46,7 +47,7 @@ export class CoursesController {
   @ApiOperation({ summary: 'Get all Course' })
   @ApiQuery({ name: 'Category', required: false })
   @ApiQuery({ name: 'CourseName', required: false })
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'Get all course success',
     type: BaseResponseDTO,
   })
@@ -59,7 +60,7 @@ export class CoursesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get one course' })
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'Get one course success',
     type: BaseResponseDTO,
   })
@@ -69,14 +70,13 @@ export class CoursesController {
 
   @Get(':id/buy')
   @ApiOperation({ summary: 'Buy Course by ID' })
-  @hasRoles('user', 'admin')
   buy(@Param('id') id: string, @Req() req) {
     return this.coursesService.buy(+id, req.user.nim);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create Course' })
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'User created successfully',
     type: Course,
   })

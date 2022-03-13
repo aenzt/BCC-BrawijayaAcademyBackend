@@ -50,31 +50,31 @@ export class CoursesService {
     };
   }
 
-  async findAll(param?: string, name?: string) {
+  async findAll(categoryParam?: string, name?: string) {
     let course = await this.courseRepository.find({
       relations: ['categories', 'author'],
     });
     if (course.length < 1) {
       throw new HttpException('No course found', HttpStatus.NOT_FOUND);
     }
-    if (param && name) {
-      console.log(param, name);
+    if (categoryParam && name) {
+      console.log(categoryParam, name);
       course = await this.courseRepository
         .createQueryBuilder('course')
         .leftJoinAndSelect('course.categories', 'category')
         .leftJoinAndSelect('course.author', 'author')
         .where('course.name like :name', { name: `%${name}%` })
-        .andWhere('category.name = :catName', { catName: param })
+        .andWhere('category.name = :catName', { catName: categoryParam })
         .getMany();
       if (course.length < 1) {
         throw new HttpException('No course found', HttpStatus.NOT_FOUND);
       }
-    } else if (param) {
+    } else if (categoryParam) {
       course = await this.courseRepository
         .createQueryBuilder('course')
         .leftJoinAndSelect('course.categories', 'category')
         .leftJoinAndSelect('course.author', 'author')
-        .where('category.name = :catName', { catName: param })
+        .where('category.name = :catName', { catName: categoryParam })
         .getMany();
       if (course.length < 1) {
         throw new HttpException('No course found', HttpStatus.NOT_FOUND);
@@ -98,7 +98,7 @@ export class CoursesService {
     };
   }
 
-  async findOne(id: number, nim?: string) {
+  async findOne(id: number, nim: string) {
     const course = await this.courseRepository.findOne(id, {
       relations: ['categories', 'author'],
     });
@@ -110,6 +110,13 @@ export class CoursesService {
     }
     if (nim) {
       const user = await this.userService.findOne(+nim);
+      if (course.author.some((item) => item.nim === +nim)) {
+        const courseOwned = instanceToPlain(course, { groups: ['owned'] });
+        return {
+          data: courseOwned,
+          message: 'Get course success',
+        };
+      }
       if (await this.userService.checkCourse(user, course)) {
         const courseOwned = instanceToPlain(course, { groups: ['owned'] });
         return {
@@ -138,7 +145,9 @@ export class CoursesService {
   }
 
   async update(id: number, updateCourseDto: UpdateCourseDto, nim: string) {
-    const course = await this.courseRepository.findOne(id);
+    const course = await this.courseRepository.findOne(id, {
+      relations: ['author'],
+    });
     const user = await this.userService.findOne(+nim);
     if (!course) {
       throw new HttpException(
@@ -146,7 +155,7 @@ export class CoursesService {
         HttpStatus.NOT_FOUND,
       );
     }
-    if (!course.author.includes(user)) {
+    if (!course.author.some((item) => item.nim === user.nim)) {
       throw new HttpException(
         `You are not the author of this course`,
         HttpStatus.BAD_REQUEST,
@@ -173,7 +182,9 @@ export class CoursesService {
   }
 
   async remove(id: number, nim: string) {
-    const course = await this.courseRepository.findOne(id);
+    const course = await this.courseRepository.findOne(id, {
+      relations: ['author'],
+    });
     const user = await this.userService.findOne(+nim);
     if (!course) {
       throw new HttpException(
@@ -181,7 +192,7 @@ export class CoursesService {
         HttpStatus.NOT_FOUND,
       );
     }
-    if (!course.author.includes(user)) {
+    if (!course.author.some((item) => item.nim === user.nim)) {
       throw new HttpException(
         `You are not the author of this course`,
         HttpStatus.BAD_REQUEST,
@@ -267,7 +278,7 @@ export class CoursesService {
   }
 
   async buy(id: number, nim: string) {
-    const course = await this.courseRepository.findOne(id);
+    const course = await this.courseRepository.findOne(id, {relations: ['author']});
     const user = await this.userService.findOne(+nim);
     if (!course) {
       throw new HttpException(
@@ -282,6 +293,12 @@ export class CoursesService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (course.author.some((item) => item.nim === user.nim)) {
+        throw new HttpException(
+          `You are the author of this course, can't buy it`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     return this.midtransCharge(course, user);
   }
 
@@ -313,8 +330,11 @@ export class CoursesService {
     };
 
     const chargeRes = await core.charge(parameter).catch((e) => {
-      throw new HttpException(
-        'Midtrans Error',
+        console.log(e);
+      throw new HttpException({
+        message: "midtrans Error",
+        error: e.message,
+      },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     });
