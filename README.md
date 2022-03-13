@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+NestJs Backend for building Brawijaya Academy at BCC Internship 2022
 
 ## Installation
 
@@ -35,6 +35,9 @@ $ npm install
 ## Running the app
 
 ```bash
+# Migrate
+$ npm run migrate:run
+
 # development
 $ npm run start
 
@@ -58,7 +61,7 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## Support Nest Here
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
@@ -67,6 +70,9 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 - Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
 - Website - [https://nestjs.com](https://nestjs.com/)
 - Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## Social Media
+- Twitter - [aenzt_](https://twitter.com/aenzt_)
 
 ## License
 
