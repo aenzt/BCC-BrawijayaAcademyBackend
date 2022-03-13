@@ -159,7 +159,7 @@ export class CoursesService {
     if (!course.author.some((item) => item.nim === user.nim)) {
       throw new HttpException(
         `You are not the author of this course`,
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.UNAUTHORIZED,
       );
     }
     if (updateCourseDto.name) {
@@ -199,7 +199,7 @@ export class CoursesService {
     if (!course.author.some((item) => item.nim === user.nim)) {
       throw new HttpException(
         `You are not the author of this course`,
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.UNAUTHORIZED,
       );
     }
     const removed = await this.courseRepository.remove(course);
@@ -267,7 +267,7 @@ export class CoursesService {
       if (course.author.find((c) => c.nim === user.nim)) {
         throw new HttpException(
           `You are already the author of this course`,
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.UNAUTHORIZED,
         );
       }
       course.author = [...course.author, user];
@@ -294,13 +294,13 @@ export class CoursesService {
     if (owned) {
       throw new HttpException(
         `You already own this course`,
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.CONFLICT,
       );
     }
     if (course.author.some((item) => item.nim === user.nim)) {
         throw new HttpException(
           `You are the author of this course, can't buy it`,
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.FORBIDDEN,
         );
       }
     return this.midtransCharge(course, user);

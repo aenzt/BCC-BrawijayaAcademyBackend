@@ -72,7 +72,7 @@ export class AuthService {
     if (error) {
       throw new HttpException(
         'NIM atau Password SIAM salah',
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
@@ -93,7 +93,7 @@ export class AuthService {
     const find = await this.usersRepository.findOne(createUserDto.nim);
 
     if (find) {
-      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+      throw new HttpException('User already exists', HttpStatus.CONFLICT);
     }
 
     user.nim = createUserDto.nim;

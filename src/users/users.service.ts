@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from 'src/courses/entities/course.entity';
 import { Repository } from 'typeorm';
@@ -39,7 +39,7 @@ export class UsersService {
   async seed() {
     const roleInDb = await this.rolesRepository.find();
     if (roleInDb) {
-      throw new HttpException('Already Seeded', 400);
+      throw new HttpException('Already Seeded', HttpStatus.CONFLICT);
     }
     const role = new Role();
     role.name = 'admin';
@@ -69,7 +69,7 @@ export class UsersService {
   async deleteUser(nim: number) {
     const user = await this.usersRepository.findOne(nim);
     if (!user) {
-      throw new HttpException('User not found', 404);
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
     const removed = await this.usersRepository.remove(user);
     return {
@@ -83,11 +83,11 @@ export class UsersService {
       relations: ['role'],
     });
     if (!user) {
-      throw new HttpException('User not found', 404);
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
     const roleToUpdate = await this.rolesRepository.findOne({ name: role });
     if (!roleToUpdate) {
-      throw new HttpException('Role not found', 404);
+      throw new HttpException('Role not found', HttpStatus.BAD_REQUEST);
     }
     user.role = roleToUpdate;
     const updated = await this.usersRepository.save(user);

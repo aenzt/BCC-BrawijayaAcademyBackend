@@ -25,7 +25,7 @@ export class CategoriesService {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(
           'This category already exist!',
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.CONFLICT,
         );
       }
       throw new HttpException(
