@@ -50,6 +50,9 @@ export class Course {
   @Exclude()
   joinCode: string;
 
+  @Column()
+  imageLink : string;
+
   @ManyToMany(() => User, (user) => user.courseCreated)
   author: User[];
 

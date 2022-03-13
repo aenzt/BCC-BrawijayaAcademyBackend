@@ -39,6 +39,7 @@ export class CoursesService {
     course.playlistLink = createCourseDto.playlistLink;
     course.price = createCourseDto.price;
     course.author = [author];
+    course.imageLink = createCourseDto.imageLink;
     const category = await this.categoryService.findOne(
       createCourseDto.categoryId,
     );
@@ -176,6 +177,9 @@ export class CoursesService {
     if (updateCourseDto.author) {
       const newAuthor = await this.userService.findOne(updateCourseDto.author);
       course.author = [...course.author, newAuthor];
+    }
+    if(updateCourseDto.imageLink){
+        course.imageLink = updateCourseDto.imageLink;
     }
 
     return this.courseRepository.save(course);

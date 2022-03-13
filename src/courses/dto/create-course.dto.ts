@@ -28,4 +28,9 @@ export class CreateCourseDto {
   @ApiProperty()
   @IsNotEmpty()
   categoryId: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUrl()
+  imageLink: string;
 }
