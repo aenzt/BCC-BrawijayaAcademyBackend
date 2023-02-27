@@ -46,7 +46,7 @@ export class UsersController {
   @hasRoles('admin')
   @ApiQuery({ name: 'role', enum: ['admin', 'instructor', 'user'] })
   editRole(@Query('role') role: string, @Req() req, @Param('id') id: string) {
-    return this.userService.updateRole(role, id);
+    return this.userService.updateRole(role, +id);
   }
 
   @Get('/user')

@@ -49,7 +49,7 @@ export class CategoriesService {
   }
 
   async findOne(id: number) {
-    const category = await this.categoryRepository.findOne(id);
+    const category = await this.categoryRepository.findOneBy({ id });
     if (!category) {
       throw new HttpException(
         `Category with id ${id} not found`,
@@ -60,7 +60,7 @@ export class CategoriesService {
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    const category = await this.categoryRepository.findOne(id);
+    const category = await this.categoryRepository.findOneBy({ id });
     if (!category) {
       throw new HttpException(
         `Category with id ${id} not found`,
@@ -74,7 +74,7 @@ export class CategoriesService {
   }
 
   async remove(id: number) {
-    const category = await this.categoryRepository.findOne(id);
+    const category = await this.categoryRepository.findOneBy({ id });
     if (!category) {
       throw new HttpException(
         `Category with id ${id} not found`,

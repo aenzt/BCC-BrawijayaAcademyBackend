@@ -93,7 +93,7 @@ export class CoursesController {
     @Body() joinCourseDto: JoinCourseDto,
   ) {
     return this.coursesService.joinInstructor(
-      id,
+      +id,
       req.user.nim,
       joinCourseDto.joinCode,
     );

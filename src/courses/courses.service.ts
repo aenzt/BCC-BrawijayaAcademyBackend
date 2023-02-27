@@ -100,7 +100,8 @@ export class CoursesService {
   }
 
   async findOne(id: number, nim: string) {
-    const course = await this.courseRepository.findOne(id, {
+    const course = await this.courseRepository.findOne({
+      where: { id },
       relations: ['categories', 'author'],
     });
     if (!course) {
@@ -133,7 +134,8 @@ export class CoursesService {
   }
 
   async findOneOrder(id: number) {
-    const course = await this.courseRepository.findOne(id, {
+    const course = await this.courseRepository.findOne({
+      where: { id },
       relations: ['categories', 'author'],
     });
     if (!course) {
@@ -146,7 +148,8 @@ export class CoursesService {
   }
 
   async update(id: number, updateCourseDto: UpdateCourseDto, nim: string) {
-    const course = await this.courseRepository.findOne(id, {
+    const course = await this.courseRepository.findOne({
+      where: { id },
       relations: ['author'],
     });
     const user = await this.userService.findOne(+nim);
@@ -178,15 +181,16 @@ export class CoursesService {
       const newAuthor = await this.userService.findOne(updateCourseDto.author);
       course.author = [...course.author, newAuthor];
     }
-    if(updateCourseDto.imageLink){
-        course.imageLink = updateCourseDto.imageLink;
+    if (updateCourseDto.imageLink) {
+      course.imageLink = updateCourseDto.imageLink;
     }
 
     return this.courseRepository.save(course);
   }
 
   async remove(id: number, nim: string) {
-    const course = await this.courseRepository.findOne(id, {
+    const course = await this.courseRepository.findOne({
+      where: { id },
       relations: ['author'],
     });
     const user = await this.userService.findOne(+nim);
@@ -210,7 +214,7 @@ export class CoursesService {
   }
 
   async updateAdmin(id: number, updateCourseDto: UpdateCourseDto) {
-    const course = await this.courseRepository.findOne(id);
+    const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
       throw new HttpException(
         `Course with id ${id} not found`,
@@ -238,7 +242,7 @@ export class CoursesService {
   }
 
   async removeAdmin(id: number) {
-    const course = await this.courseRepository.findOne(id);
+    const course = await this.courseRepository.findOneBy({ id });
     if (!course) {
       throw new HttpException(
         `Course with id ${id} not found`,
@@ -252,8 +256,9 @@ export class CoursesService {
     };
   }
 
-  async joinInstructor(id: string, nim: string, uniqueCode: string) {
-    const course = await this.courseRepository.findOne(+id, {
+  async joinInstructor(id: number, nim: string, uniqueCode: string) {
+    const course = await this.courseRepository.findOne({
+      where: { id },
       relations: ['author'],
     });
     if (!course) {
@@ -282,7 +287,10 @@ export class CoursesService {
   }
 
   async buy(id: number, nim: string) {
-    const course = await this.courseRepository.findOne(id, {relations: ['author']});
+    const course = await this.courseRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     const user = await this.userService.findOne(+nim);
     if (!course) {
       throw new HttpException(
@@ -298,11 +306,11 @@ export class CoursesService {
       );
     }
     if (course.author.some((item) => item.nim === user.nim)) {
-        throw new HttpException(
-          `You are the author of this course, can't buy it`,
-          HttpStatus.FORBIDDEN,
-        );
-      }
+      throw new HttpException(
+        `You are the author of this course, can't buy it`,
+        HttpStatus.FORBIDDEN,
+      );
+    }
     return this.midtransCharge(course, user);
   }
 
@@ -334,11 +342,12 @@ export class CoursesService {
     };
 
     const chargeRes = await core.charge(parameter).catch((e) => {
-        console.log(e);
-      throw new HttpException({
-        message: "midtrans Error",
-        error: e.message,
-      },
+      console.log(e);
+      throw new HttpException(
+        {
+          message: 'midtrans Error',
+          error: e.message,
+        },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     });

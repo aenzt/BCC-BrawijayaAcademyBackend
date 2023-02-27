@@ -15,13 +15,14 @@ export class UsersService {
   ) {}
 
   async findOne(nim: number): Promise<User | undefined> {
-    return this.usersRepository.findOne(nim, {
+    return this.usersRepository.findOne({
+      where: { nim },
       relations: ['role', 'coursesOwned'],
     });
   }
 
   async findOneWithoutRelation(nim: number): Promise<User | undefined> {
-    return this.usersRepository.findOne(nim);
+    return this.usersRepository.findOneBy({ nim });
   }
 
   async update(nim: number, user: User): Promise<User> {
@@ -50,8 +51,9 @@ export class UsersService {
     await this.rolesRepository.save(role);
   }
 
-  async checkRole(nim: string, roles: string[]) {
-    const user = await this.usersRepository.findOne(nim, {
+  async checkRole(nim: number, roles: string[]) {
+    const user = await this.usersRepository.findOne({
+      where: { nim },
       relations: ['role'],
     });
     for (const role of roles) {
@@ -67,7 +69,7 @@ export class UsersService {
   }
 
   async deleteUser(nim: number) {
-    const user = await this.usersRepository.findOne(nim);
+    const user = await this.usersRepository.findOneBy({ nim });
     if (!user) {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
@@ -78,14 +80,17 @@ export class UsersService {
     };
   }
 
-  async updateRole(role: string, nim: string) {
-    const user = await this.usersRepository.findOne(+nim, {
+  async updateRole(role: string, nim: number) {
+    const user = await this.usersRepository.findOne({
+      where: { nim: nim },
       relations: ['role'],
     });
     if (!user) {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
-    const roleToUpdate = await this.rolesRepository.findOne({ name: role });
+    const roleToUpdate = await this.rolesRepository.findOne({
+      where: { name: role },
+    });
     if (!roleToUpdate) {
       throw new HttpException('Role not found', HttpStatus.BAD_REQUEST);
     }

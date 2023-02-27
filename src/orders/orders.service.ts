@@ -27,7 +27,7 @@ export class OrdersService {
   }
 
   async update(orderId: string, transactionStatus: string) {
-    const order = await this.orderRepository.findOne(orderId);
+    const order = await this.orderRepository.findOneBy({ orderId });
     if (transactionStatus) {
       order.transcationStatus = transactionStatus;
     }
@@ -41,7 +41,7 @@ export class OrdersService {
   }
 
   async findAll(nim: number) {
-    const order = await this.orderRepository.find({ userId: nim });
+    const order = await this.orderRepository.find({ where: { userId: nim } });
     if (!order || order.length < 1) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
     }
@@ -50,8 +50,7 @@ export class OrdersService {
 
   async findOne(nim: number, orderId: string) {
     const order = await this.orderRepository.findOne({
-      userId: nim,
-      orderId: orderId,
+      where: { userId: nim, orderId: orderId },
     });
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);

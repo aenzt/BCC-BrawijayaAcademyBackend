@@ -1,14 +1,13 @@
-import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Role } from "../users/entities/role.entity";
-import { User } from "../users/entities/user.entity";
-import { UsersService } from "../users/users.service";
-import { CreateUserDto } from "./dto/createUser.dto";
-import { loginUserDto } from "./dto/loginUser.dto";
-import * as puppeteer from "puppeteer";
-
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Role } from '../users/entities/role.entity';
+import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { CreateUserDto } from './dto/createUser.dto';
+import { loginUserDto } from './dto/loginUser.dto';
+import * as puppeteer from 'puppeteer';
 
 @Injectable()
 export class AuthService {
@@ -90,7 +89,9 @@ export class AuthService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = new User();
-    const find = await this.usersRepository.findOne(createUserDto.nim);
+    const find = await this.usersRepository.findOne({
+      where: { nim: createUserDto.nim },
+    });
 
     if (find) {
       throw new HttpException('User already exists', HttpStatus.CONFLICT);
@@ -104,10 +105,10 @@ export class AuthService {
       createUserDto.nim.toString(),
       createUserDto.password,
     );
-    user.role = await this.rolesRepository.findOne({ name: 'user' });
+    user.role = await this.rolesRepository.findOne({ where: { name: 'user' } });
     if (createUserDto.role) {
       user.role = await this.rolesRepository.findOne({
-        name: createUserDto.role,
+        where: { name: createUserDto.role },
       });
     }
     user.fullName = fullName;
